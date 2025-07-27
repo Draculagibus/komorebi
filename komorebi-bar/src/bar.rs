@@ -74,11 +74,56 @@ use std::process::Stdio;
 use std::rc::Rc;
 use std::sync::atomic::Ordering;
 use std::sync::Arc;
+use systray_util::{Systray, SystrayEvent}; 
 
 const CREATE_NO_WINDOW: u32 = 0x0800_0000;
 
 lazy_static! {
     static ref SESSION_STDIN: Mutex<Option<ChildStdin>> = Mutex::new(None);
+}
+
+struct SystrayWidget {
+    systray: Systray,
+    icons: Vec<String>,  // Pour stocker les icônes
+}
+
+impl SystrayWidget {
+    // Crée un nouveau widget Systray
+    fn new() -> Self {
+        let mut systray = Systray::new().unwrap();  // Initialise systray
+        SystrayWidget {
+            systray,
+            icons: Vec::new(),  // Initialise la liste des icônes
+        }
+    }
+
+    // Met à jour les événements (icônes ajoutées, mises à jour, ou supprimées)
+    fn update(&mut self) {
+        for event in self.systray.events_blocking() {
+            match event {
+                SystrayEvent::IconAdd(icon) => {
+                    self.icons.push(icon.image.to_string());  // Ajoute l'icône
+                }
+                SystrayEvent::IconUpdate(icon) => {
+                    // Mets à jour l'icône si nécessaire
+                }
+                SystrayEvent::IconRemove(id) => {
+                    self.icons.retain(|icon| icon != &id.to_string());  // Supprime l'icône par ID
+                }
+            }
+        }
+    }
+
+    // Dessine les icônes dans la barre
+    fn draw(&self, ui: &mut egui::Ui) {
+        ui.horizontal(|ui| {
+            for icon in &self.icons {
+                // Pour chaque icône, afficher son image (c'est un exemple basique, ici il faut un vrai affichage d'icône)
+                let size = egui::vec2(20.0, 20.0);
+                ui.image(icon, size);  // Affiche l'icône
+            }
+        });
+    }
 }
 
 fn start_powershell() -> Result<()> {
