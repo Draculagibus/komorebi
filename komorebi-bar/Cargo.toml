@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 komorebi-client = { path = "../komorebi-client", default-features = false }
 komorebi-themes = { path = "../komorebi-themes", default-features = false }
+systray-util = "0.1.0"
 
 chrono-tz = { workspace = true }
 chrono = { workspace = true }
