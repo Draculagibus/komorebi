@@ -467,6 +467,12 @@ impl Komobar {
             .map(|config| config.as_boxed_bar_widget())
             .collect::<Vec<Box<dyn BarWidget>>>();
 
+        if self.config.systray.enable {
+            let systray_widget = SystrayWidget::new();  // Crée une instance de SystrayWidget
+            let boxed_widget: Box<dyn BarWidget> = Box::new(systray_widget);  // Mets-le dans un Box
+            right_widgets.push(boxed_widget);  // Ajoute le widget Systray à la liste des widgets à droite
+        }
+        
         if !komorebi_widgets.is_empty() {
             komorebi_widgets
                 .into_iter()
